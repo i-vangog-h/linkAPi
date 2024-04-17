@@ -8,7 +8,7 @@ var configuration = builder.Configuration;
 // Add services to the container.
 
 builder.Services.AddDbContext<LinkShortenerContext>(options =>
-    options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")),
+    options.UseNpgsql(configuration.GetConnectionString("PostgresConnection")),
     contextLifetime: ServiceLifetime.Transient,
     optionsLifetime: ServiceLifetime.Transient
 );

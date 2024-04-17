@@ -1,17 +1,22 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using linkApi.Entities;
 
 namespace linkApi.DataContext;
 
 public partial class LinkShortenerContext : DbContext
 {
-    public LinkShortenerContext()
+    private readonly IConfiguration _configuration;
+
+    public LinkShortenerContext(IConfiguration configuration)
     {
+        _configuration = configuration;
     }
 
-    public LinkShortenerContext(DbContextOptions<LinkShortenerContext> options)
+    public LinkShortenerContext(DbContextOptions<LinkShortenerContext> options, IConfiguration configuration)
         : base(options)
-    {
+    { 
+        _configuration = configuration;
     }
 
     public virtual DbSet<Url> Urls { get; set; }
@@ -20,7 +25,7 @@ public partial class LinkShortenerContext : DbContext
     {
         if (!optionsBuilder.IsConfigured)
         {
-            optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=link_shortener;Username=postgres;Password=12345678"); 
+            optionsBuilder.UseNpgsql(_configuration.GetConnectionString("PostgresConnection"));
         }
  
     }
