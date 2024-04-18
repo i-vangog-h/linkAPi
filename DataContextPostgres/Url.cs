@@ -1,16 +1,18 @@
 ﻿namespace linkApi.Entities;
-public partial class Url
+public class Url
 {
-    public string HashKey { get; set; } = null!;
+    public int Id { get; set; }
+
+    public string Hash { get; set; } = null!;
 
     public string OriginalUrl { get; set; } = null!;
 
-    public DateOnly? CreatedAt { get; set; }
+    public DateTime? CreatedAt { get; set; }
 
     public int? AccessCount { get; set; }
 
     public Url()
     {
-        CreatedAt = new DateOnly();
+        CreatedAt = DateTime.Now;
     }
 }
