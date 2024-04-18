@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using linkApi.Entities;
 using linkApi.Repositories;
 using linkApi.Services;
+using linkApi.Factories;
 
 namespace linkApi.Controllers;
 
@@ -12,10 +13,12 @@ public class ShortController : ControllerBase
 {
     private UrlRepo _repo;
     private HashingService _hashingService;
+    private UrlFactory _urlFactory;
     public ShortController(UrlRepo repo)
     {
         _repo = repo;
         _hashingService = new HashingService();
+        _urlFactory = new UrlFactory();
     }
 
     [HttpPost]
@@ -23,23 +26,59 @@ public class ShortController : ControllerBase
     [ProducesResponseType(400)]
     public async Task<IActionResult> Generate([FromBody] string ogUrl)
     {
-        //generate a shortened link
-        //save it to a db
-        return Created(ogUrl, "huj");
-    }
+        if (!_urlFactory.IsValidUrl(ogUrl))
+        {
+            return BadRequest("Incorrect url format");
+        }
 
-    [HttpGet("{hashkey}")]
-    [ProducesResponseType(200)]
-    [ProducesResponseType(302)]
-    [ProducesResponseType(404)]
-    public async Task<IActionResult> GetOriginal(string hashkey)
-    {
-        Url? url = await _repo.RetreiveByIdAsync(hashkey);
+        Url? url;
+        string encoded = "";
+
+        url = await _repo.FindByOgUrl(ogUrl);
 
         if(url is not null)
         {
-            //return Redirect(url.OriginalUrl);
-            return Ok(_hashingService.EncodeBase64(url.OriginalUrl));
+            encoded = url.Hash;
+        }
+
+        url = _urlFactory.Create(ogUrl, ensureValidity: false);
+
+        url = await _repo.CreateRecordAsync(url!);
+        
+        if(url is null)
+        {
+            return BadRequest("DB error create, change error type in the future");
+        }
+
+        url = await _repo.FindByOgUrl(ogUrl);
+
+        encoded = _hashingService.EncodeBase10To62(url!.Id);
+
+        url.Hash = encoded;
+
+        url = await _repo.UpdateAsync(url);
+
+        if(url is null)
+        {
+            return BadRequest("DB error update, change error type in the future");
+        }
+
+        return Created(uri: $"api/short/{encoded}", value: encoded);
+    }
+
+    [HttpGet("{urlEncoded}")]
+    [ProducesResponseType(200)]
+    [ProducesResponseType(302)]
+    [ProducesResponseType(404)]
+    public async Task<IActionResult> GetOriginal(string urlEncoded)
+    {
+        Url? url = await _repo.RetreiveByHashAsync(urlEncoded);
+
+        if(url is not null)
+        {
+            url.AccessCount++;
+            await _repo.UpdateAsync(url);
+            return Redirect(url.OriginalUrl);
         }
 
         return Ok("NOT FOUND");
