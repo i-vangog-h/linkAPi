@@ -3,7 +3,7 @@ public class Url
 {
     public int Id { get; set; }
 
-    public string Hash { get; set; } = null!;
+    public string? Hash { get; set; }
 
     public string OriginalUrl { get; set; } = null!;
 
