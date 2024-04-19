@@ -8,7 +8,7 @@ public class HashingService
 
     //returns hashed url wich will be used as a pattern
 
-    public string EncodeBase10To62(int base10Id)
+    public string EncodeBase10To62(int base10Id, out string hash)
     {
         StringBuilder sb = new StringBuilder();
         int n = base10Id;
@@ -17,8 +17,23 @@ public class HashingService
             sb.Append(baseLiterals[n % 62]);
             n = n / 62;
         }
-        return Reverse(sb.ToString());
+        hash = Reverse(sb.ToString());
+
+        return hash;
     }
+    public string EncodeBase10To62(int base10Id)
+    {
+        StringBuilder sb = new StringBuilder();
+        int n = base10Id;
+        while (n > 0)
+        {
+            sb.Append(baseLiterals[n % 62]);
+            n = n / 62;
+        }
+        return Reverse(sb.ToString());
+
+    }
+
 
     private string Reverse(string hash)
     {
@@ -35,7 +50,25 @@ public class HashingService
 
     public int DecodeBase62To10(string base62Hash)
     {
-        return 0;
+        int id = 0;
+
+        for (int i = 0; i < base62Hash.Length; i++)
+        {
+            // Determining the value of base62 signs in decimal 
+            // according to their position in baseLiterals array and their ASCII code.
+
+            if ('a' <= base62Hash[i] &&
+                       base62Hash[i] <= 'z')
+                id = id * 62 + base62Hash[i] - 'a';
+            if ('A' <= base62Hash[i] &&
+                       base62Hash[i] <= 'Z')
+                id = id * 62 + base62Hash[i] - 'A' + 26;
+            if ('0' <= base62Hash[i] &&
+                       base62Hash[i] <= '9')
+                id = id * 62 + base62Hash[i] - '0' + 52;
+        }
+
+        return id;
     }
 
 
