@@ -13,6 +13,18 @@ public class UrlRepo
         _db = db;
     }
 
+    public async Task<Url?> FindById(int id)
+    {
+        Url? url = await _db.Urls.SingleOrDefaultAsync(u => u.Id == id);
+
+        if (url is null)
+        {
+            return null;
+        }
+
+        return url; 
+    }
+
     public async Task<Url?> RetreiveByHashAsync(string urlEncoded)
     {
         Url? url = await _db.Urls.FirstOrDefaultAsync(u => u.Hash == urlEncoded);
@@ -45,7 +57,7 @@ public class UrlRepo
         var affected = await _db.SaveChangesAsync();
         if (affected == 1)
         {
-            return url;
+            return await _db.Urls.FirstAsync(u => u.OriginalUrl == url.OriginalUrl);
         }
 
         return null;

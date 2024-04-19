@@ -32,17 +32,27 @@ public class ShortController : ControllerBase
         }
 
         Url? url;
-        string encoded = "";
+        string baseUri = $"{Request.Scheme}://{Request.Host}";
 
         url = await _repo.FindByOgUrl(ogUrl);
 
+        //url already exists in a db
         if(url is not null)
         {
-            encoded = url.Hash;
+            if(url.Hash != _hashingService.EncodeBase10To62(url.Id, out string newHash))
+            {
+                url.Hash = newHash;
+
+                var result = await _repo.UpdateAsync(url);
+                if (result is null) WriteLine("Unable to add hash a url record");
+
+                return Ok(value: $"{baseUri}/api/short/{url.Hash}");
+            }
+
+            return Ok(value: $"{baseUri}/api/short/{url.Hash}");
         }
 
         url = _urlFactory.Create(ogUrl, ensureValidity: false);
-
         url = await _repo.CreateRecordAsync(url!);
         
         if(url is null)
@@ -50,12 +60,11 @@ public class ShortController : ControllerBase
             return BadRequest("DB error create, change error type in the future");
         }
 
-        url = await _repo.FindByOgUrl(ogUrl);
+        // Need to save url to a DB first for an id to be assigned to it.
+        // Then use this id to generate a hash for the url's record.
 
-        encoded = _hashingService.EncodeBase10To62(url!.Id);
-
-        url.Hash = encoded;
-
+        string hash = _hashingService.EncodeBase10To62(url.Id);
+        url.Hash = hash;
         url = await _repo.UpdateAsync(url);
 
         if(url is null)
@@ -63,24 +72,29 @@ public class ShortController : ControllerBase
             return BadRequest("DB error update, change error type in the future");
         }
 
-        return Created(uri: $"api/short/{encoded}", value: encoded);
-    }
+        return Created(uri: $"{baseUri}/api/short/{hash}", value: hash);
+    }   
 
-    [HttpGet("{urlEncoded}")]
+    [HttpGet("{hash}")]
     [ProducesResponseType(200)]
     [ProducesResponseType(302)]
+    [ProducesResponseType(400)]
     [ProducesResponseType(404)]
-    public async Task<IActionResult> GetOriginal(string urlEncoded)
+    public async Task<IActionResult> GetOriginal(string hash)
     {
-        Url? url = await _repo.RetreiveByHashAsync(urlEncoded);
 
-        if(url is not null)
+        int urlId = _hashingService.DecodeBase62To10(hash);
+        
+        Url? url = await _repo.FindById(urlId);
+
+        if (url is null)
         {
-            url.AccessCount++;
-            await _repo.UpdateAsync(url);
-            return Redirect(url.OriginalUrl);
+            return BadRequest("Provided hash is not assigned to any url at the moment.");
         }
 
-        return Ok("NOT FOUND");
+        url.AccessCount++;
+        await _repo.UpdateAsync(url);
+        return Redirect(url.OriginalUrl);
+        
     }
 }
