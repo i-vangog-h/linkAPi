@@ -36,17 +36,20 @@ public partial class LinkShortenerContext : DbContext
 
         modelBuilder.Entity<Url>(entity =>
         {
-            entity.HasKey(e => e.HashKey).HasName("url_pkey");
+            entity.HasKey(e => e.Id).HasName("url_pkey");
 
-            entity.ToTable("URL");
+            entity.ToTable("url");
 
-            entity.Property(e => e.HashKey)
-                .HasMaxLength(100)
-                .HasColumnName("hash_key");
+            entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.AccessCount)
                 .HasDefaultValue(0)
                 .HasColumnName("access_count");
-            entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+            entity.Property(e => e.CreatedAt)
+                .HasColumnType("timestamp without time zone")
+                .HasColumnName("created_at");
+            entity.Property(e => e.Hash)
+                .HasMaxLength(10)
+                .HasColumnName("hash");
             entity.Property(e => e.OriginalUrl).HasColumnName("original_url");
         });
 
