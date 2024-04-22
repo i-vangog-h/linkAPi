@@ -7,7 +7,7 @@ using linkApi.Factories;
 
 namespace linkApi.Controllers;
 
-[Route("api/short")]
+[Route("api")]
 [ApiController]
 public class ShortController : ControllerBase
 {
@@ -21,7 +21,7 @@ public class ShortController : ControllerBase
         _urlFactory = new UrlFactory();
     }
 
-    [HttpPost]
+    [HttpPost("generate")]
     [ProducesResponseType(201, Type = typeof(string))]
     [ProducesResponseType(400)]
     public async Task<IActionResult> Generate([FromBody] string ogUrl)
@@ -37,14 +37,14 @@ public class ShortController : ControllerBase
         url = await _repo.FindByOgUrl(ogUrl);
 
         //url already exists in a db
-        if(url is not null)
+        if (url is not null)
         {
-            if(url.Hash != _hashingService.EncodeBase10To62(url.Id, out string newHash))
+            if (url.Hash != _hashingService.EncodeBase10To62(url.Id, out string newHash))
             {
                 url.Hash = newHash;
 
                 var result = await _repo.UpdateAsync(url);
-                if (result is null) WriteLine("Unable to add hash a url record");
+                if (result is null) WriteLine("Unable to add hash to a url record");
 
                 return Ok(value: $"{baseUri}/api/short/{url.Hash}");
             }
@@ -54,8 +54,8 @@ public class ShortController : ControllerBase
 
         url = _urlFactory.Create(ogUrl, ensureValidity: false);
         url = await _repo.CreateRecordAsync(url!);
-        
-        if(url is null)
+
+        if (url is null)
         {
             return BadRequest("DB error create, change error type in the future");
         }
@@ -67,16 +67,15 @@ public class ShortController : ControllerBase
         url.Hash = hash;
         url = await _repo.UpdateAsync(url);
 
-        if(url is null)
+        if (url is null)
         {
             return BadRequest("DB error update, change error type in the future");
         }
 
-        return Created(uri: $"{baseUri}/api/short/{hash}", value: hash);
-    }   
+        return Created(uri: $"{baseUri}/api/short/{hash}", value: $"{baseUri}/api/short/{hash}");
+    }
 
-    [HttpGet("{hash}")]
-    [ProducesResponseType(200)]
+    [HttpGet("get-original/{hash}")]
     [ProducesResponseType(302)]
     [ProducesResponseType(400)]
     [ProducesResponseType(404)]
@@ -84,7 +83,7 @@ public class ShortController : ControllerBase
     {
 
         int urlId = _hashingService.DecodeBase62To10(hash);
-        
+
         Url? url = await _repo.FindById(urlId);
 
         if (url is null)
@@ -94,7 +93,18 @@ public class ShortController : ControllerBase
 
         url.AccessCount++;
         await _repo.UpdateAsync(url);
+
+        // just return ogUrl to a caller, let it redirect itself
+        //return Ok(url.OriginalUrl);
+
+        //temp
         return Redirect(url.OriginalUrl);
-        
+
+    }
+
+    [HttpDelete("remove-record/{id: int}")]
+    public async Task<bool> RemoveRecord(int id)
+    {
+
     }
 }
