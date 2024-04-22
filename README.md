@@ -1,5 +1,4 @@
-Pet Project
-Link Shortener Service API
+<h1>Link Shortener Service API</h1>
 
-main tech: C# .NET, ASP.NET Core
-DB: Postgresql via EF Core
+_Main tech_: **C# .NET, ASP.NET Core** <br>
+_DB_: **Postgresql via EF Core**
