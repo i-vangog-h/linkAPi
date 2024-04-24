@@ -117,6 +117,16 @@ public class ShortController : ControllerBase
         return Ok(url);
     }
 
+    [HttpGet("get-all")]
+    [ProducesResponseType(200)]
+    [ProducesResponseType(404)]
+    public async Task<IActionResult> GetAll()
+    {
+        Url[] urls = await _repo.RetreiveAllAsync();
+
+        return Ok(urls);
+    }
+
     [HttpDelete("remove-record/{id:int}")]
     [ProducesResponseType(204)]
     [ProducesResponseType(400)]

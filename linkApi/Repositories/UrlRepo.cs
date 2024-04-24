@@ -39,6 +39,11 @@ public class UrlRepo : IUrlRepo
         return url;
     }
 
+    public async Task<Url[]> RetreiveAllAsync()
+    {
+        return await _db.Urls.OrderBy(u => u.Id).ToArrayAsync();
+    }
+
     public async Task<Url?> CreateAsync(Url url)
     {
         await _db.Urls.AddAsync(url);
