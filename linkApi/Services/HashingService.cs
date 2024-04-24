@@ -1,13 +1,23 @@
 ﻿namespace linkApi.Services;
 using System.Text;
+using linkApi.Interfaces;
 
-public class HashingService
+public class HashingService : IHashingService
 {
+    public HashingService() 
+    { 
+        WriteLine ("Hashing Service instantiated."); 
+    }
+
     // Url can only consist of one of these 62 characters
     private readonly char[] baseLiterals = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".ToCharArray();
 
-    //returns hashed url wich will be used as a pattern
 
+    /// <summary>
+    /// </summary>
+    /// <param name="base10Id"></param>
+    /// <param name="hash"></param>
+    /// <returns>Returns encoded id which will be used as a hash for the URL.</returns>
     public string EncodeBase10To62(int base10Id, out string hash)
     {
         StringBuilder sb = new StringBuilder();
@@ -33,7 +43,6 @@ public class HashingService
         return Reverse(sb.ToString());
 
     }
-
 
     private string Reverse(string hash)
     {

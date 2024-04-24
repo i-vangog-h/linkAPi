@@ -1,14 +1,17 @@
 using Microsoft.EntityFrameworkCore;
 using linkApi.DataContext;
 using linkApi.Repositories;
+using linkApi.Interfaces;
+using linkApi.Services;
+using linkApi.Factories;
 
 var builder = WebApplication.CreateBuilder(args);
-var configuration = builder.Configuration;
+var _configuration = builder.Configuration;
 
 // Add services to the container.
 
 builder.Services.AddDbContext<LinkShortenerContext>(options =>
-    options.UseNpgsql(configuration.GetConnectionString("PostgresConnection")),
+    options.UseNpgsql(_configuration.GetConnectionString("PostgresConnection")),
     contextLifetime: ServiceLifetime.Transient,
     optionsLifetime: ServiceLifetime.Transient
 );
@@ -17,7 +20,12 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddScoped<UrlRepo, UrlRepo>();
+
+builder.Services.AddScoped<IUrlRepo, UrlRepo>();
+builder.Services.AddScoped<IHashingService, HashingService>();
+builder.Services.AddScoped<IUrlFactory, UrlFactory>();
+
+/* ############################################################## */ 
 
 var app = builder.Build();
 

@@ -1,9 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using linkApi.Entities;
-using linkApi.Repositories;
-using linkApi.Services;
-using linkApi.Factories;
+using linkApi.Interfaces;
+using System.Diagnostics.CodeAnalysis;
 
 namespace linkApi.Controllers;
 
@@ -11,24 +9,25 @@ namespace linkApi.Controllers;
 [ApiController]
 public class ShortController : ControllerBase
 {
-    private UrlRepo _repo;
-    private HashingService _hashingService;
-    private UrlFactory _urlFactory;
-    public ShortController(UrlRepo repo)
+    private IUrlRepo _repo;
+    private IHashingService _hashingService;
+    private IUrlFactory _urlFactory;
+    public ShortController(IUrlRepo repo, IHashingService hashingService, IUrlFactory urlFactory)
     {
         _repo = repo;
-        _hashingService = new HashingService();
-        _urlFactory = new UrlFactory();
+        _hashingService = hashingService;
+        _urlFactory = urlFactory;
     }
-
+    
     [HttpPost("generate")]
-    [ProducesResponseType(201, Type = typeof(string))]
-    [ProducesResponseType(400)]
+    [ProducesResponseType(200)] // Ok
+    [ProducesResponseType(201)] // Created
+    [ProducesResponseType(400)] // Bad Request
     public async Task<IActionResult> Generate([FromBody] string ogUrl)
     {
         if (!_urlFactory.IsValidUrl(ogUrl))
         {
-            return BadRequest("Incorrect url format");
+            return BadRequest("Incorrect url format"); //400
         }
 
         Url? url;
@@ -45,19 +44,17 @@ public class ShortController : ControllerBase
 
                 var result = await _repo.UpdateAsync(url);
                 if (result is null) WriteLine("Unable to add hash to a url record");
-
-                return Ok(value: $"{baseUri}/api/short/{url.Hash}");
             }
 
-            return Ok(value: $"{baseUri}/api/short/{url.Hash}");
+            return Ok(value: $"{baseUri}/api/get-original/{url.Hash}"); //200
         }
 
         url = _urlFactory.Create(ogUrl, ensureValidity: false);
-        url = await _repo.CreateRecordAsync(url!);
+        url = await _repo.CreateAsync(url!);
 
         if (url is null)
         {
-            return BadRequest("DB error create, change error type in the future");
+            return BadRequest("DB error create, change error type in the future"); //400
         }
 
         // Need to save url to a DB first for an id to be assigned to it.
@@ -69,42 +66,59 @@ public class ShortController : ControllerBase
 
         if (url is null)
         {
-            return BadRequest("DB error update, change error type in the future");
+            return BadRequest("DB error update, change error type in the future"); //400
         }
 
-        return Created(uri: $"{baseUri}/api/short/{hash}", value: $"{baseUri}/api/short/{hash}");
+        return Created(uri: $"{baseUri}/api/get-original/{hash}", value: $"{baseUri}/api/get-original/{hash}"); //201
     }
+
+    private string getRoutePattern = "get-original";
 
     [HttpGet("get-original/{hash}")]
     [ProducesResponseType(302)]
-    [ProducesResponseType(400)]
     [ProducesResponseType(404)]
     public async Task<IActionResult> GetOriginal(string hash)
     {
-
         int urlId = _hashingService.DecodeBase62To10(hash);
 
-        Url? url = await _repo.FindById(urlId);
+        Url? url = await _repo.FindByIdAsync(urlId);
 
         if (url is null)
         {
-            return BadRequest("Provided hash is not assigned to any url at the moment.");
+            return NotFound("Provided hash is not assigned to any url at the moment.");
         }
 
         url.AccessCount++;
         await _repo.UpdateAsync(url);
 
         // just return ogUrl to a caller, let it redirect itself
-        //return Ok(url.OriginalUrl);
+        return Ok(url.OriginalUrl);
 
         //temp
-        return Redirect(url.OriginalUrl);
+        //return Redirect(url.OriginalUrl); //302
 
     }
 
-    [HttpDelete("remove-record/{id: int}")]
-    public async Task<bool> RemoveRecord(int id)
+    [HttpDelete("remove-record/{id:int}")]
+    [ProducesResponseType(204)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(404)]
+    public async Task<IActionResult> RemoveRecord(int id)
     {
+        bool? deleted = await _repo.DeleteAsync(id);
 
+        if(deleted is null)
+        {
+            return NotFound();
+        }
+
+        if (deleted.Value)
+        {
+            return NoContent(); //204
+        }
+        else
+        {
+            return BadRequest($"Url {id} was found but failed to delete."); //400
+        }
     }
 }

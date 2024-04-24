@@ -1,19 +1,20 @@
 ﻿using linkApi.DataContext;
 using linkApi.Entities;
+using linkApi.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace linkApi.Repositories;
 
-public class UrlRepo
+public class UrlRepo : IUrlRepo
 {
     private readonly LinkShortenerContext _db;
     public UrlRepo(LinkShortenerContext db)
     {
         _db = db;
+        WriteLine("Repo instantiated.");
     }
 
-    public async Task<Url?> FindById(int id)
+    public async Task<Url?> FindByIdAsync(int id)
     {
         Url? url = await _db.Urls.SingleOrDefaultAsync(u => u.Id == id);
 
@@ -23,19 +24,6 @@ public class UrlRepo
         }
 
         return url; 
-    }
-
-    public async Task<Url?> RetreiveByHashAsync(string urlEncoded)
-    {
-        Url? url = await _db.Urls.FirstOrDefaultAsync(u => u.Hash == urlEncoded);
-
-        if (url is null)
-        {
-            WriteLine("Failed to retreive the url object");
-            return null;
-        }
-
-        return url;
     }
 
     public async Task<Url?> FindByOgUrl(string ogUrl)
@@ -51,7 +39,7 @@ public class UrlRepo
         return url;
     }
 
-    public async Task<Url?> CreateRecordAsync(Url url)
+    public async Task<Url?> CreateAsync(Url url)
     {
         await _db.Urls.AddAsync(url);
         var affected = await _db.SaveChangesAsync();
@@ -75,5 +63,21 @@ public class UrlRepo
         }
 
         return null;
+    }
+
+    public async Task<bool?> DeleteAsync(int id)
+    {
+        Url? url = await FindByIdAsync(id);
+        if (url is null) return null;
+
+        _db.Urls.Remove(url);
+        int affected = await _db.SaveChangesAsync();
+        if(affected == 1)
+        {
+            return true;
+        }
+
+        return false;
+
     }
 }

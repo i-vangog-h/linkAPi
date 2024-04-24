@@ -1,9 +1,14 @@
 ﻿using linkApi.Entities;
+using linkApi.Interfaces;
 
 namespace linkApi.Factories;
 
-public class UrlFactory
+public class UrlFactory : IUrlFactory
 {
+    public UrlFactory()
+    {
+        WriteLine("Factory instantiated.");
+    }
     /// <summary>
     /// Creates a Url object for a given url string.
     /// </summary>
