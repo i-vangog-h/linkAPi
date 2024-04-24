@@ -26,7 +26,7 @@ public class UrlRepo : IUrlRepo
         return url; 
     }
 
-    public async Task<Url?> FindByOgUrl(string ogUrl)
+    public async Task<Url?> FindByOgUrlAsync(string ogUrl)
     {
         Url? url = await _db.Urls.SingleOrDefaultAsync(u => u.OriginalUrl == ogUrl);
 

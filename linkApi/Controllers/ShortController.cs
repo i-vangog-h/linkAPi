@@ -31,10 +31,10 @@ public class ShortController : ControllerBase
             return BadRequest("Incorrect url format"); //400
         }
 
-        string baseUri = $"{Request.Scheme}://{Request.Host}/api/get-original";
+        string baseUri = $"{Request.Scheme}://{Request.Host}/api";
 
         Url? url;
-        url = await _repo.FindByOgUrl(ogUrl);
+        url = await _repo.FindByOgUrlAsync(ogUrl);
 
         //url already exists in a db
         if (url is not null)
@@ -48,7 +48,7 @@ public class ShortController : ControllerBase
                 if (result is null) WriteLine($"Unable to add hash to url {url.Id}");
             }
 
-            return Ok(value: $"{baseUri}/{url.Hash}"); //200
+            return Ok(value: $"{baseUri}/get-original/{url.Hash}"); //200
         }
 
         url = _urlFactory.Create(ogUrl, ensureValidity: false);
@@ -71,14 +71,15 @@ public class ShortController : ControllerBase
             return BadRequest($"DB: Failed to add hash to url {url.Id}"); //400
         }
 
-        return Created(uri: $"{baseUri}/{url.Hash}", value: $"{baseUri}/{url.Hash}"); //201
+        return Created(uri: $"{baseUri}/get-record/{url.Id}", value: $"{baseUri}/get-original/{url.Hash}"); //201
     }
 
     
 
     [HttpGet("get-original/{hash}")]
-    [ProducesResponseType(302)]
-    [ProducesResponseType(404)]
+    [ProducesResponseType(200, Type = typeof(string))] // Ok
+    [ProducesResponseType(302)] // Found -> redirect 
+    [ProducesResponseType(404)] // Not Found
     public async Task<IActionResult> GetOriginal(string hash)
     {
         int urlId = _hashingService.DecodeBase62To10(hash);
@@ -99,6 +100,21 @@ public class ShortController : ControllerBase
         //temp
         //return Redirect(url.OriginalUrl); //302
 
+    }
+
+    [HttpGet("get-record/{id:int}")]
+    [ProducesResponseType(200)]
+    [ProducesResponseType(404)]
+    public async Task<IActionResult> GetRecord(int id)
+    {
+        Url? url = await _repo.FindByIdAsync(id);
+
+        if(url is null)
+        {
+            return NotFound();
+        }
+
+        return Ok(url);
     }
 
     [HttpDelete("remove-record/{id:int}")]
