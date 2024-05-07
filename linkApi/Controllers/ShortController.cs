@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using linkApi.Entities;
 using linkApi.Interfaces;
-using System.Diagnostics.CodeAnalysis;
 
 namespace linkApi.Controllers;
 
@@ -31,7 +30,7 @@ public class ShortController : ControllerBase
             return BadRequest("Incorrect url format"); //400
         }
 
-        string baseUri = $"{Request.Scheme}://{Request.Host}/api";
+        string baseUri = $"{Request.Scheme}://{Request.Host}/api"; 
 
         Url? url;
         url = await _repo.FindByOgUrlAsync(ogUrl);
@@ -74,8 +73,8 @@ public class ShortController : ControllerBase
         return Created(uri: $"{baseUri}/get-record/{url.Id}", value: $"{baseUri}/get-original/{url.Hash}"); //201
     }
 
-    
 
+    
     [HttpGet("get-original/{hash}")]
     [ProducesResponseType(200, Type = typeof(string))] // Ok
     [ProducesResponseType(302)] // Found -> redirect 
@@ -117,7 +116,7 @@ public class ShortController : ControllerBase
         return Ok(url);
     }
 
-    [HttpGet("get-all")]
+    [HttpGet("get-all", Name = "GETALL")]
     [ProducesResponseType(200)]
     [ProducesResponseType(404)]
     public async Task<IActionResult> GetAll()
