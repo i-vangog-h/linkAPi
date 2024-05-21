@@ -4,10 +4,24 @@ using linkApi.Repositories;
 using linkApi.Interfaces;
 using linkApi.Services;
 using linkApi.Factories;
-using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 var _configuration = builder.Configuration;
+var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+
+
+// Add CORS policy
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: MyAllowSpecificOrigins,
+                      policy =>
+                      {
+                          policy.WithOrigins("*")
+                          .WithMethods("POST", "DELETE", "GET")
+                          .AllowAnyHeader();
+                      });
+});
 
 // Add services to the container.
 
@@ -43,17 +57,13 @@ else
 }
 
 app.UseHttpsRedirection();
+app.UseRouting();
+
+app.UseCors(MyAllowSpecificOrigins);
+
 app.UseAuthorization();
 
 app.MapControllers();
 app.Map("/", () => { return "index"; });
-
-//app.UseMvc(routes =>
-//{
-//    routes.MapRoute(
-//        name: default,
-//        template: "{controller=Home}/{action=Index}/{id?}"
-//    );
-//});
 
 app.Run();
