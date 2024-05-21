@@ -2,3 +2,7 @@
 
 _Main tech_: **C# .NET, ASP.NET Core** <br>
 _DB_: **Postgresql via EF Core**
+
+
+The project is commited without appsettings.json file, containing DB connection credentials. <br>
+DB connection string needs to be configured first, before runnig the app.
