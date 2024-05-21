@@ -47,7 +47,7 @@ public class ShortController : ControllerBase
                 if (result is null) WriteLine($"Unable to add hash to url {url.Id}");
             }
 
-            return Ok(value: $"{baseUri}/get-original/{url.Hash}"); //200
+            return Ok(value: new { shortenedUrl = url.Hash }); //200
         }
 
         url = _urlFactory.Create(ogUrl, ensureValidity: false);
@@ -69,8 +69,7 @@ public class ShortController : ControllerBase
         {
             return BadRequest($"DB: Failed to add hash to url {url.Id}"); //400
         }
-
-        return Created(uri: $"{baseUri}/get-record/{url.Id}", value: $"{baseUri}/get-original/{url.Hash}"); //201
+        return Created(uri: $"{baseUri}/get-record/{url.Id}", value: new { shortenedUrl = url.Hash }) ; //201
     }
 
 
