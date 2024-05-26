@@ -37,6 +37,7 @@ public class ShortController : ControllerBase
         Url? url;
         url = await _repo.FindByOgUrlAsync(ogUrl);
 
+
         //url already exists in a db
         if (url is not null)
         {
@@ -49,9 +50,14 @@ public class ShortController : ControllerBase
                 if (result is null) WriteLine($"Unable to add hash to url {url.Id}");
             }
 
-            return Ok(value: new { hash = url.Hash }); //200
+            return Ok(
+                value: new {
+                    shortUrl = $"{baseUri}/get-original/{url.Hash}"
+                }
+            ); //200
         }
 
+        //url doesnt exist -> generate 
         url = _urlFactory.Create(ogUrl, ensureValidity: false);
         url = await _repo.CreateAsync(url!);
 
@@ -67,11 +73,16 @@ public class ShortController : ControllerBase
         url.Hash = hash;
 
         var updated = await _repo.UpdateAsync(url);
-        if (updated is null)
-        {
+
+        if (updated is null) 
             return BadRequest($"DB: Failed to add hash to url {url.Id}"); //400
-        }
-        return Created(uri: $"{baseUri}/get-record/{url.Id}", value: new { hash = url.Hash }) ; //201
+        
+        return Created( 
+            uri: $"{baseUri}/get-record/{url.Id}",
+            value: new {
+                    shortUrl = $"{baseUri}/get-original/{url.Hash}",
+                }
+            ); //201
     }
 
 
@@ -95,10 +106,10 @@ public class ShortController : ControllerBase
         await _repo.UpdateAsync(url);
 
         // just return ogUrl to a caller, let it redirect itself
-        return Ok(url.OriginalUrl);
+        //return Ok(url.OriginalUrl);
 
-        //temp
-        //return Redirect(url.OriginalUrl); //302
+        
+        return Redirect(url.OriginalUrl); //302
 
     }
 
