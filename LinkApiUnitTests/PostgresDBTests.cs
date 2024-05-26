@@ -1,6 +1,5 @@
 using linkApi.DataContext;
 using linkApi.Entities;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
 namespace linkApi.Tests;

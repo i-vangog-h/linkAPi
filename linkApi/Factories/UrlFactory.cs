@@ -36,4 +36,13 @@ public class UrlFactory : IUrlFactory
         return Uri.TryCreate(url, UriKind.Absolute, out Uri? uriResult)
             && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
     }
+
+    public string Normalize(string url)
+    {
+        int k = url.Length;
+
+        while (url[k - 1] == '/') k--;
+       
+        return url.Substring(0, k);
+    }
 }

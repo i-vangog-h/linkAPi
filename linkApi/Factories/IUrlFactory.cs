@@ -11,4 +11,5 @@ public interface IUrlFactory
     /// <returns>Returns a Url object or null if provided url was in an incorrect format.</returns>
     Url? Create(string ogUrl, bool ensureValidity = true);
     bool IsValidUrl(string url);
+    string Normalize(string url);
 }

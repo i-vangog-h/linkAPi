@@ -25,10 +25,12 @@ public class ShortController : ControllerBase
     [ProducesResponseType(400)] // Bad Request
     public async Task<IActionResult> Generate([FromBody] string ogUrl)
     {
-        if (!_urlFactory.IsValidUrl(ogUrl))
+        if (!_urlFactory.IsValidUrl(ogUrl)) 
         {
             return BadRequest("Incorrect url format"); //400
         }
+
+        ogUrl = _urlFactory.Normalize(ogUrl); //truncate trailing forward-slash
 
         string baseUri = $"{Request.Scheme}://{Request.Host}/api"; 
 
@@ -47,7 +49,7 @@ public class ShortController : ControllerBase
                 if (result is null) WriteLine($"Unable to add hash to url {url.Id}");
             }
 
-            return Ok(value: new { shortenedUrl = url.Hash }); //200
+            return Ok(value: new { hash = url.Hash }); //200
         }
 
         url = _urlFactory.Create(ogUrl, ensureValidity: false);
@@ -69,7 +71,7 @@ public class ShortController : ControllerBase
         {
             return BadRequest($"DB: Failed to add hash to url {url.Id}"); //400
         }
-        return Created(uri: $"{baseUri}/get-record/{url.Id}", value: new { shortenedUrl = url.Hash }) ; //201
+        return Created(uri: $"{baseUri}/get-record/{url.Id}", value: new { hash = url.Hash }) ; //201
     }
 
 
