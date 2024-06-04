@@ -3,8 +3,20 @@
 **tech**: C# .NET, ASP.NET Core <br>
 **db**: Postgresql, EF Core
 
-**!!!** The project is commited without appsettings.json file, containing DB connection credentials. <br>
-DB connection string needs to be configured first, before runnig the app.
+<h2>Startup and Configuration</h2>
+git clone this repo </br>
+
+cd to `./linkApi` </br> </br>
+
+**for dev** </br>
+- rename `appsettings.json` to `appsettings.Development.json`, add credentials for db connection </br>
+- run `dotnet watch -lp dev` for auto hot reload as well</br>
+</br>
+
+**for prod** </br>
+- add credentials for db connection to `appsettings.json` </br>
+- run `dotnet run -lp prod`
+
 
 </br>
 <h3>IMPORTANT CLI COMMANDS</h3>
