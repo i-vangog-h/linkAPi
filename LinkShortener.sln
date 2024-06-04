@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "linkApi", "linkApi\linkApi.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataContextPostgres", "dataContextPostgres\DataContextPostgres.csproj", "{B4C44894-5960-4E2F-8A8E-A075503C1789}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LinkApiUnitTests", "LinkApiUnitTests\LinkApiUnitTests.csproj", "{1F00BC40-6065-4B40-9E8D-A0832E760685}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LinkApiUnitTests", "LinkApiUnitTests\LinkApiUnitTests.csproj", "{1F00BC40-6065-4B40-9E8D-A0832E760685}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -15,12 +15,12 @@ var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(name: MyAllowSpecificOrigins,
-                      policy =>
-                      {
-                          policy.WithOrigins("*")
-                          .WithMethods("POST", "DELETE", "GET")
-                          .AllowAnyHeader();
-                      });
+        policy =>
+        {
+            policy.WithOrigins("*")
+            .WithMethods("POST", "DELETE", "GET")
+            .AllowAnyHeader();
+        });
 });
 
 // Add services to the container.
