@@ -4,14 +4,14 @@
 **db**: Postgresql, EF Core
 
 <h2>Startup and Configuration</h2>
-git clone this repo </br>
+git clone this repo </br> </br>
 
-cd to `./linkApi` </br> </br>
+cd to `./linkApi` </br>
 
 **for dev** </br>
 - rename `appsettings.json` to `appsettings.Development.json`, add credentials for db connection </br>
-- run `dotnet watch -lp dev` for auto hot reload as well</br>
-</br>
+- run `dotnet watch -lp dev` (auto hot reload enabled) </br>
+
 
 **for prod** </br>
 - add credentials for db connection to `appsettings.json` </br>
