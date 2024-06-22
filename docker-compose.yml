@@ -3,6 +3,8 @@ version: '3.4'
 services:
   linkapi.api:
     image: ${DOCKER_REGISTRY-}linkapi
+    depends_on:
+        - linkapi.database
     container_name: linkapi.api
     build:
       context: .
@@ -10,6 +12,8 @@ services:
     ports:
       - "5010:5010"
       - "5011:5011"
+    environment:
+       DB_CONNECTION_STRING: "Host=linkapi.database;Port=5432;Database=link_shortener;Username=postgres;Password=12345678"
 
   linkapi.database:
     image: postgres:latest
@@ -19,8 +23,13 @@ services:
         - POSTGRES_USER=postgres
         - POSTGRES_PASSWORD=12345678
     volumes:
-        - ./.containers/linkapi-db:/var/lib/postgres/data
+        - ./db_volume:/var/lib/postgres/data
+        - ./DataContextPostgres/seed.sql :/docker-entrypoint-initdb.d/seed.sql
     ports:
       - 5432:5432
+    restart: always
+
+volumes:
+   db_volume:   
     
  
