@@ -1,7 +1,5 @@
 {
-  "$schema": "http://json.schemastore.org/launchsettings.json",
   "profiles": {
-
     "prod": {
       "commandName": "Project",
       "environmentVariables": {
@@ -10,7 +8,6 @@
       "dotnetRunMessages": true,
       "applicationUrl": "https://localhost:5011;http://localhost:5010"
     },
-
     "dev": {
       "commandName": "Project",
       "launchBrowser": true,
@@ -20,7 +17,18 @@
       },
       "dotnetRunMessages": true,
       "applicationUrl": "https://localhost:5011;http://localhost:5010"
+    },
+    "Container (Dockerfile)": {
+      "commandName": "Docker",
+      "launchBrowser": true,
+      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/swagger",
+      "environmentVariables": {
+        "ASPNETCORE_HTTPS_PORTS": "8081",
+        "ASPNETCORE_HTTP_PORTS": "8080"
+      },
+      "publishAllPorts": true,
+      "useSSL": true
     }
-
-  }
+  },
+  "$schema": "http://json.schemastore.org/launchsettings.json"
 }

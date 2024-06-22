@@ -1,0 +1,26 @@
+version: '3.4'
+
+services:
+  linkapi.api:
+    image: ${DOCKER_REGISTRY-}linkapi
+    container_name: linkapi.api
+    build:
+      context: .
+      dockerfile: linkApi/Dockerfile
+    ports:
+      - "5010:5010"
+      - "5011:5011"
+
+  linkapi.database:
+    image: postgres:latest
+    container_name: linkapi.postgres.database
+    environment:
+        - POSTGRES_DB=link_shortener
+        - POSTGRES_USER=postgres
+        - POSTGRES_PASSWORD=12345678
+    volumes:
+        - ./.containers/linkapi-db:/var/lib/postgres/data
+    ports:
+      - 5432:5432
+    
+ 
