@@ -6,17 +6,14 @@ namespace linkApi.DataContext;
 
 public partial class LinkShortenerContext : DbContext
 {
-    private readonly IConfiguration _configuration;
 
-    public LinkShortenerContext(IConfiguration configuration)
+    public LinkShortenerContext()
     {
-        _configuration = configuration;
     }
 
-    public LinkShortenerContext(DbContextOptions<LinkShortenerContext> options, IConfiguration configuration)
+    public LinkShortenerContext(DbContextOptions<LinkShortenerContext> options)
         : base(options)
     { 
-        _configuration = configuration;
     }
 
     public virtual DbSet<Url> Urls { get; set; }
@@ -25,7 +22,7 @@ public partial class LinkShortenerContext : DbContext
     {
         if (!optionsBuilder.IsConfigured)
         {
-            optionsBuilder.UseNpgsql(_configuration.GetConnectionString("PostgresConnection"));
+            optionsBuilder.UseNpgsql(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING"));
         }
  
     }

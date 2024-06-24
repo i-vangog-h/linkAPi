@@ -1,8 +1,5 @@
-﻿using linkApi.DataContext;
-using linkApi.Entities;
-using linkApi.Factories;
+﻿using linkApi.Factories;
 using linkApi.Interfaces;
-using Microsoft.Extensions.Configuration;
 
 namespace linkApi.Tests;
 

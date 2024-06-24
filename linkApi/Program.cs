@@ -25,8 +25,10 @@ builder.Services.AddCors(options =>
 
 // Add services to the container.
 
+var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
+
 builder.Services.AddDbContext<LinkShortenerContext>(options =>
-    options.UseNpgsql(_configuration.GetConnectionString("PostgresConnection")),
+    options.UseNpgsql(connectionString),
     contextLifetime: ServiceLifetime.Transient,
     optionsLifetime: ServiceLifetime.Transient
 );
