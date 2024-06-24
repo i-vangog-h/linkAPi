@@ -24,7 +24,7 @@ services:
         - POSTGRES_PASSWORD=12345678
     volumes:
         - ./db_volume:/var/lib/postgres/data
-        - ./DataContextPostgres/seed.sql :/docker-entrypoint-initdb.d/seed.sql
+        - ./DataContextPostgres/seed.sql:/docker-entrypoint-initdb.d/seed.sql
     ports:
       - 5432:5432
     restart: always
