@@ -14,6 +14,13 @@ services:
       - "5011:5011"
     environment:
        DB_CONNECTION_STRING: "Host=linkapi.database;Port=5432;Database=link_shortener;Username=postgres;Password=12345678"
+       ASPNETCORE_ENVIRONMENT: "Development"
+       ASPNETCORE_HTTP_PORTS: "5010"
+       ASPNETCORE_HTTPS_PORTS: "5011"
+       ASPNETCORE_Kestrel__Certificates__Default__Password: "1234"
+       ASPNETCORE_Kestrel__Certificates__Default__Path: "/https/linkapi.pfx"
+    volumes:
+       - ~/.aspnet/https:/https:ro
 
   linkapi.database:
     image: postgres:latest
