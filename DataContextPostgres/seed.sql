@@ -1,7 +1,7 @@
 CREATE TABLE url
 (
     id SERIAL PRIMARY KEY,
-    hash VARCHAR(10) NOT NULL,
+    hash VARCHAR(10),
     original_url TEXT NOT NULL UNIQUE,
     created_at TIMESTAMP,
     access_count INT DEFAULT 0
