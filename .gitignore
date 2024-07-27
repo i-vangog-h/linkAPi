@@ -371,3 +371,4 @@ FodyWeavers.xsd
 /LinkApiUnitTests/LinkApiUnitTests.csproj
 /LinkApiUnitTests/PostgresDBTests.cs
 /LinkApiUnitTests/appsettings.test.json
+/linkApi/appsettings.json
