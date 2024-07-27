@@ -44,25 +44,17 @@ public class UrlRepo : IUrlRepo
         return await _db.Urls.OrderBy(u => u.Id).ToArrayAsync();
     }
 
-    
-    /*public async Task<Url?> CreateAsync(Url url)
+    public async Task<Url?> CreateAsync(Url url)
     {
-        var task = _db.Urls.AddAsync(url).AsTask().ContinueWith( task =>
-            {
-                _db.SaveChangesAsync().ContinueWith(task =>
-                    {
-                        int affected = task.Result;
-                        if (affected == 1)
-                        {
-                            return _db.Urls.FirstAsync(u => u.OriginalUrl == url.OriginalUrl);
-                        }
-                                    return null;
-                   }
-                );
-            }
-        );
-        return task;
-    }*/
+        await _db.Urls.AddAsync(url);
+        var affected = await _db.SaveChangesAsync();
+        if (affected == 1)
+        {
+            return await _db.Urls.FirstAsync(u => u.OriginalUrl == url.OriginalUrl);
+        }
+
+        return null;
+    }
 
     public async Task<Url?> UpdateAsync(Url url)
     {
