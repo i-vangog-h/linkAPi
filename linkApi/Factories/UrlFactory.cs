@@ -39,8 +39,10 @@ public class UrlFactory : IUrlFactory
 
     public string Normalize(string url)
     {
-        int k = url.Length;
+        url = url.Trim();
 
+        // remove trailing forward slashes
+        int k = url.Length;
         while (url[k - 1] == '/') k--;
        
         return url.Substring(0, k);
